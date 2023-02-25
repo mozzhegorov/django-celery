@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from celery.schedules import crontab
 
 import environ
 from easy_thumbnails.conf import Settings as thumbnail_settings
@@ -323,7 +324,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'check_reminder_to_study': {
         'task': 'timeline.tasks.notify_study_sometimes',
-        'schedule': timedelta(days=7),
+        'schedule': crontab(hour=10, minute=00, day_of_week=1),
     },
 }
 
