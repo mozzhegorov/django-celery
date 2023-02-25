@@ -188,3 +188,41 @@ class TestReminderEmail(ClassIntegrationTestCase):
         out_emails = [outbox.to[0] for outbox in mail.outbox]
         self.assertIn(c1.customer.user.email, out_emails)
         self.assertIn(c.customer.user.email, out_emails)
+
+    @patch('market.signals.Owl')
+    def test_two_subscribe_one_reminder_v2(self, Owl):
+        self.lesson = mixer.blend('lessons.MasterClass', host=self.host, slots=5)
+
+        entry = self._create_entry()
+        entry.slots = 5
+        entry.save()
+        print(entry.__dict__)
+
+        entry1 = self._create_entry()
+        entry1.start = self.tzdatetime(2032, 9, 1, 12, 0)
+        entry1.slots = 5
+        entry1.save()
+        print(entry1.start)
+
+        c = self._buy_a_lesson()
+        self._schedule(c, entry)
+
+        c1 = self._buy_a_lesson()
+        self._schedule(c1, entry1)
+
+        subscription_c = self._buy_a_subscription(c.customer, False)
+        c.subscription = subscription_c
+        c.save()
+
+        subscription_c1 = self._buy_a_subscription(c1.customer, False)
+        c1.subscription = subscription_c1
+        c1.save()
+
+        with freeze_time('2032-09-14 20:00'):   # 2032-09-13 entry starts, send one remind for 1 student, 2 subscribe, 1 forgotten
+            notify_study_sometimes()
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        out_emails = [outbox.to[0] for outbox in mail.outbox]
+        self.assertIn(c1.customer.user.email, out_emails)
+        self.assertIn(c.customer.user.email, out_emails)
