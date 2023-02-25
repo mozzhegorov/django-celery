@@ -1,0 +1,21 @@
+{% extends "mail_templated/base.tpl" %}
+
+{% load absolute_url %}
+
+{% block subject %}
+Hey, {{ c.first_name | capfirst }}, you dont have lessons for a long time!
+{% endblock %}
+
+{% block body %}
+Dear {{ c.first_name | capfirst }},
+
+You left time from eour subscribe!
+
+You can plan it in the dashboard at {% absolute_url "home" %}#schedule.
+
+We look forward to getting to meet you at your next lesson!
+
+Dream BIG and make it happen
+ELK Academy
+Education + Love = Knowledge
+{% endblock %}

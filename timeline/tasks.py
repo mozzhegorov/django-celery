@@ -45,9 +45,9 @@ def notify_study_sometimes():
     for market_class in customers_weeked_lessons:
         customer = Customer.objects.get(id=market_class['customer_id'])
         owl = Owl(
-            template='mail/class/student/reminder.html',
+            template='mail/reminder_for_inactive_students.html',
             ctx={
-                'customer': customer,
+                'c': customer,
             },
             to=[customer.user.email],
             timezone=customer.user.crm.timezone,
